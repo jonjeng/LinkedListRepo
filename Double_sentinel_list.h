@@ -166,7 +166,7 @@ bool Double_sentinel_list<Type>::empty() const {
     
     // Return true if size == 0 and/or the head sentinel points to the tail sentinel (value 0)
     Double_node<Type> *check = list_head;
-    if (list_size == 0 || check->next_node->retrieve() == -1) return true;
+    if (check->next_node->retrieve() == -1) return true;
     
     // Otherwise, the list is not empty
     return false;
