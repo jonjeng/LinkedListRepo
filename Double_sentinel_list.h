@@ -1,4 +1,10 @@
 /*****************************************
+ 
+ 
+ =============================================================================
+ Should we edit these portions of the file since we aren't going to uwaterloo?
+ =============================================================================
+ 
  * Instructions
  *  - Replace 'uwuserid' with your uWaterloo User ID
  *  - Select the current calendar term and enter the year
@@ -86,7 +92,7 @@ list_size( 0 ) {
 	// fix assignments...
 	// enter your implementation here
     
-    // Allocate two sentinels with corresponding next_node and previous_node assignments (the sentinels are designated as having value -1
+    // Allocate two sentinels with corresponding next_node and previous_node assignments (the sentinels - list_head and list_tail - are designated as having value -1
     list_head = new Double_node<Type>(-1, nullptr, nullptr);
     list_tail = new Double_node<Type>(-1, list_head, nullptr);
     
@@ -101,6 +107,12 @@ list_head( nullptr ),
 list_tail( nullptr ),
 list_size( 0 ) {
 	// enter your implementation here
+    // The copy constructor must create a new doubly linked list with a copy of all of the nodes within the linked list with the elements stored in the same order. Once a copy is made, any change to the original linked list must not affect the copy. (O(n))
+    
+    // Allocate two sentinels with corresponding next_node and previous_node assignments (the sentinels - list_head and list_tail - are designated as having value -1
+    list_head = new Double_node<Type>(-1, nullptr, nullptr);
+    list_tail = new Double_node<Type>(-1, list_head, nullptr);
+    list_head->next_node = list_tail;
     
     // The to-be-copied list shall be referred to as source, and the newly created list shall be referred to as copyList
     // If the list to be copied is empty, nothing is to be done
@@ -110,9 +122,10 @@ list_size( 0 ) {
     push_front( list.front() );
     
     // Copy the elements of source, including tail_sentinel (value -1), to copy_list
-    for (Double_node<Type> *source = list.list_head->next(), *copy = list.list_head; (source != nullptr); copy = copy->next(), source = source->next())
+    for (Double_node<Type> *source = list.list_head->next(), *prev = list.list_head, *curr = list_head; (source != nullptr); prev = prev->next(), source = source->next(), curr = curr->next_node)
     {
-        copy->next_node = new Double_node<Type>(source->retrieve(), copy, source);
+        curr->next_node = new Double_node<Type>(source->retrieve(), prev, list_tail);
+        list_tail->previous_node = curr;
     }
 }
 
@@ -219,9 +232,11 @@ void Double_sentinel_list<Type>::swap( Double_sentinel_list<Type> &list ) {
 
 template <typename Type>
 Double_sentinel_list<Type> &Double_sentinel_list<Type>::operator=( Double_sentinel_list<Type> const &rhs ) {
-	Double_sentinel_list<Type> copy( rhs );
-
-	swap( copy );
+	// Makes a copy of the argument and then swaps the member variables of this node doubly linked sentinel list those of the copy. (O(nlhs + nrhs))
+    
+    Double_sentinel_list<Type> copy( rhs );
+    
+	this->swap( copy );
 	
 	return *this;
 }
