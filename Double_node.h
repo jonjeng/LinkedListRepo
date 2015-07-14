@@ -1,26 +1,11 @@
 /*****************************************
- * Instructions
- *  - Replace 'uwuserid' with your uWaterloo User ID
- *  - Select the current calendar term and enter the year
- *  - List students with whom you had discussions and who helped you
- *
- * uWaterloo User ID:  uwuserid @uwaterloo.ca
- * Submitted for ECE 250
- * Department of Electrical and Computer Engineering
- * University of Waterloo
- * Calender Term of Submission:  (Winter|Spring|Fall) 201N
- *
- * By submitting this file, I affirm that
- * I am the author of all modifications to
- * the provided code.
- *
- * The following is a list of uWaterloo User IDs of those students
- * I had discussions with in preparing this project:
- *    -
- *
- * The following is a list of uWaterloo User IDs of those students
- * who helped me with this project (describe their help; e.g., debugging):
- *    -
+ Project 1 - CIS 22C
+ 
+ * Contributors:
+ * Evan Finnigan
+ * Forest Finnigan
+ * Jonathan Jeng
+ * Abhishek Rajbahndri
  *****************************************/
 
 #ifndef DOUBLE_NODE_H
@@ -63,10 +48,6 @@ class Double_node {
 		friend class Double_sentinel_list<Type>;
 		friend class Cyclic_double_sentinel_list<Type>;
 
-		// if ptr is a pointer to a Double_node<Type> object
-		// in one of the friendly classes, you should:
-		//    use   ptr->next_node   to modify it
-		//    use   ptr->next()      to access it
 };
 
 template <typename Type>
@@ -79,19 +60,16 @@ next_node( n ) {
 
 template <typename Type>
 Type Double_node<Type>::retrieve() const {
-	// enter your implementation here
 	return element;
 }
 
 template <typename Type>
 Double_node<Type> *Double_node<Type>::previous() const {
-	// enter your implementation here
 	return previous_node;
 }
 
 template <typename Type>
 Double_node<Type> *Double_node<Type>::next() const {
-	// enter your implementation here
 	return next_node;
 }
 
