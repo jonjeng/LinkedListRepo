@@ -1,32 +1,11 @@
 /*****************************************
+ Project 1 - CIS 22C
  
- 
- =============================================================================
- Should we edit these portions of the file since we aren't going to uwaterloo?
- =============================================================================
- 
- * Instructions
- *  - Replace 'uwuserid' with your uWaterloo User ID
- *  - Select the current calendar term and enter the year
- *  - List students with whom you had discussions and who helped you
- *
- * uWaterloo User ID:  uwuserid @uwaterloo.ca
- * Submitted for ECE 250
- * Department of Electrical and Computer Engineering
- * University of Waterloo
- * Calender Term of Submission: Summer 2015
- *
- * By submitting this file, I affirm that
- * I am the author of all modifications to
- * the provided code.
- *
- * The following is a list of uWaterloo User IDs of those students
- * I had discussions with in preparing this project:
- *    -
- *
- * The following is a list of uWaterloo User IDs of those students
- * who helped me with this project (describe their help; e.g., debugging):
- *    -
+ * Contributors:
+ * Evan Finnigan
+ * Forest Finnigan
+ * Jonathan Jeng
+ * Abhishek Rajbahndri
  *****************************************/
 
 #ifndef DOUBLE_SENTINEL_LIST_H
@@ -89,9 +68,6 @@ Double_sentinel_list<Type>::Double_sentinel_list():
 list_head( nullptr ),
 list_tail( nullptr ),
 list_size( 0 ) {
-	// fix assignments...
-	// enter your implementation here
-    
     // Allocate two sentinels with corresponding next_node and previous_node assignments (the sentinels - list_head and list_tail - are designated as having value -1
     list_head = new Double_node<Type>(-1, nullptr, nullptr);
     list_tail = new Double_node<Type>(-1, list_head, nullptr);
@@ -103,12 +79,9 @@ list_size( 0 ) {
 
 template <typename Type>
 Double_sentinel_list<Type>::Double_sentinel_list( Double_sentinel_list<Type> const &list ):
-list_head( nullptr ), 
+list_head( nullptr ),
 list_tail( nullptr ),
-list_size( 0 ) {
-	// enter your implementation here
-    // The copy constructor must create a new doubly linked list with a copy of all of the nodes within the linked list with the elements stored in the same order. Once a copy is made, any change to the original linked list must not affect the copy. (O(n))
-    
+list_size( list.list_size ) {
     // Allocate two sentinels with corresponding next_node and previous_node assignments (the sentinels - list_head and list_tail - are designated as having value -1
     list_head = new Double_node<Type>(-1, nullptr, nullptr);
     list_tail = new Double_node<Type>(-1, list_head, nullptr);
@@ -118,20 +91,16 @@ list_size( 0 ) {
     // If the list to be copied is empty, nothing is to be done
     if (list.empty()) return;
     
-    // Copy the head_sentinel (value -1) of source to copyList
-    push_front( list.front() );
-    
     // Copy the elements of source, including tail_sentinel (value -1), to copy_list
-    for (Double_node<Type> *source = list.list_head->next(), *prev = list.list_head, *curr = list_head; (source != nullptr); prev = prev->next(), source = source->next(), curr = curr->next_node)
+    for (Double_node<Type> *source = list.list_head->next(), *curr = list_head; (source->retrieve() != -1); source = source->next(), curr = curr->next_node)
     {
-        curr->next_node = new Double_node<Type>(source->retrieve(), prev, list_tail);
-        list_tail->previous_node = curr;
+        curr->next_node = new Double_node<Type>(source->retrieve(), curr, list_tail);
+        list_tail->previous_node = (curr->next_node);
     }
 }
 
 template <typename Type>
 Double_sentinel_list<Type>::~Double_sentinel_list() {
-	// enter your implementation here
     while (!empty()) pop_front();
     delete list_head;
     delete list_tail;
@@ -139,31 +108,16 @@ Double_sentinel_list<Type>::~Double_sentinel_list() {
 
 template <typename Type>
 int Double_sentinel_list<Type>::size() const {
-	// enter your implementation here
 	// If the list is empty, return 0
     if (empty()) return 0;
     
-    // Otherwise, find the size of the list
-    // count is a variable to count the number of items in the list, excluding the two sentinels
-    int count = 0;
-    
-    // counter is a pointer to list items. It must start at the element following the head_sentinel and end at the element immediately prior to the tail_sentinel (value -1
-    Double_node<Type> *counter = list_head;
-    
-    while (counter->next_node->retrieve() != -1)
-    {
-        count++;
-        counter = counter->next();
-    }
-    
-    return count;
+    // Otherwise, return the size of the list
+    return list_size;
     
 }
 
 template <typename Type>
 bool Double_sentinel_list<Type>::empty() const {
-	// enter your implementation here
-    
     // Return true if size == 0 and/or the head sentinel points to the tail sentinel (value 0)
     Double_node<Type> *check = list_head;
     if (check->next_node->retrieve() == -1) return true;
@@ -174,48 +128,53 @@ bool Double_sentinel_list<Type>::empty() const {
 
 template <typename Type>
 Type Double_sentinel_list<Type>::front() const {
-	// enter your implementation here
-    
-    Double_node<Type> *tmpPtr = list_head->next();
-    return tmpPtr->retrieve();
+    try {
+        // If the list is empty, throw an underflow exception
+        if (list_size == 0)
+            throw underflow();
+        // Return the contents of the first node past the head
+        return list_head->next()->retrieve();
+    }
+    catch(underflow & exception){
+        // Inform the client of the underflow exception
+        std::cout << "Error: there are no items in the list!\nThe returned value of -1 represents the head sentinel" << std::endl;
+        return -1;
+    }
 }
 
 template <typename Type>
 Type Double_sentinel_list<Type>::back() const {
-	// enter your implementation here
-    
-    // If size == 0, the back is the tail sentinel (value -1)
-    if (list_size == 0) return -1;
-    
-    // Move through the list to the node preceding the tail sentinel (value -1)
-    Double_node<Type> *tmpPtr = list_head->next();
-    while (tmpPtr->next() != nullptr)
-        tmpPtr = tmpPtr->next_node;
-    
-    // Move one back to the node immediately preceding the tail sentinel
-    tmpPtr = tmpPtr->previous();
-    
-	return tmpPtr->retrieve();
+    try {
+        // If the list is empty, throw an underflow exception
+        if (list_size == 0)
+            throw underflow();
+        // Return the contents of the first node past the head
+        return list_tail->previous_node->retrieve();
+    }
+    catch(underflow & exception){
+        // Inform the client of the underflow exception
+        std::cout << "Error: there are no items in the list!\nThe returned value of -1 represents the tail sentinel" << std::endl;
+        return -1;
+    }
 }
 
 template <typename Type>
 Double_node<Type> *Double_sentinel_list<Type>::head() const {
-	// enter your implementation here
 	return list_head;
 }
 
 template <typename Type>
 Double_node<Type> *Double_sentinel_list<Type>::tail() const {
-	// enter your implementation here
 	return list_tail;
 }
 
 template <typename Type>
 int Double_sentinel_list<Type>::count( Type const &obj ) const {
-	// enter your implementation here
-    //    Returns the number of nodes in the linked list storing a value equal to the argument. (O(n))
+    // Returns the number of nodes in the linked list storing a value equal to the argument
+    // If the list is empty, we already know there are 0 instances of the argument
     if (list_size == 0) return 0;
     
+    // Otherwise, iterate through the list and count the number of matching instances
     int count = 0;
     for (Double_node<Type> *tmpPtr = list_head; tmpPtr != nullptr; tmpPtr = tmpPtr->next_node)
         if (tmpPtr->element == obj) count++;
@@ -233,7 +192,6 @@ void Double_sentinel_list<Type>::swap( Double_sentinel_list<Type> &list ) {
 template <typename Type>
 Double_sentinel_list<Type> &Double_sentinel_list<Type>::operator=( Double_sentinel_list<Type> const &rhs ) {
 	// Makes a copy of the argument and then swaps the member variables of this node doubly linked sentinel list those of the copy. (O(nlhs + nrhs))
-    
     Double_sentinel_list<Type> copy( rhs );
     
 	this->swap( copy );
@@ -243,8 +201,6 @@ Double_sentinel_list<Type> &Double_sentinel_list<Type>::operator=( Double_sentin
 
 template <typename Type>
 void Double_sentinel_list<Type>::push_front( Type const &obj ) {
-	// enter your implementation here
-    
     Double_node<Type> *tmpPtr = list_head->next_node;
     Double_node<Type> *tmpPtr2 = nullptr;
     tmpPtr2 = new Double_node<Type>(obj, list_head, tmpPtr);
@@ -255,8 +211,6 @@ void Double_sentinel_list<Type>::push_front( Type const &obj ) {
 
 template <typename Type>
 void Double_sentinel_list<Type>::push_back( Type const &obj ) {
-	// enter your implementation here
-    
     Double_node<Type> *tmpPtr = list_tail->previous_node;
     Double_node<Type> *tmpPtr2 = new Double_node<Type>(obj, tmpPtr, list_tail);
     list_tail->previous_node = tmpPtr2;
@@ -267,40 +221,58 @@ void Double_sentinel_list<Type>::push_back( Type const &obj ) {
 
 template <typename Type>
 Type Double_sentinel_list<Type>::pop_front() {
-	// enter your implementation here
-    if (list_head->next_node == list_tail)
+    try {
+        // If the list is empty, throw an underflow exception
+        if (list_size == 0)
+            throw underflow();
+        // Delete the front node and return its contents
+        Double_node<Type> *tmpPtr = list_head->next_node->next_node;
+        Type temp = list_head->next_node->retrieve();
+        delete list_head->next_node;
+        list_head->next_node = tmpPtr;
+        tmpPtr->previous_node = list_head;
+        list_size--;
+        return temp;
+    }
+    catch(underflow & exception){
+        // Inform the client of the underflow exception
+        std::cout << "Error: there are no items in the list!\nThe returned value of -1 represents the head sentinel" << std::endl;
         return -1;
-    Double_node<Type> *tmpPtr = list_head->next_node;
-    Double_node<Type> *tmpPtr2 = tmpPtr->next_node;
-    Type temp = tmpPtr->retrieve();
-    delete tmpPtr;
-    list_head->next_node = tmpPtr2;
-    tmpPtr2->previous_node = list_head;
-    list_size--;
-	return temp;
+    }
+    
 }
 
 template <typename Type>
 Type Double_sentinel_list<Type>::pop_back() {
-	// enter your implementation here
-    if (list_tail->previous_node == list_head)
+    
+    try {
+        // If the list is empty, throw an underflow exception
+        if (list_size == 0)
+            throw underflow();
+        
+        // Remove the back node and return its value
+        Double_node<Type> *tmpPtr = list_tail->previous_node->previous_node;
+        Type temp = list_tail->previous_node->retrieve();
+        delete list_tail->previous_node;
+        list_tail->previous_node = tmpPtr;
+        tmpPtr->next_node = list_tail;
+        list_size--;
+        return temp;
+    }
+    catch(underflow & exception){
+        // Inform the client of the underflow exception
+        std::cout << "Error: there are no items in the list!\nThe returned value of -1 represents the tail sentinel" << std::endl;
         return -1;
-    Double_node<Type> *tmpPtr = list_tail->previous_node;
-    Double_node<Type> *tmpPtr2 = tmpPtr->previous_node;
-    Type temp = tmpPtr->retrieve();
-    delete tmpPtr;
-    list_tail->previous_node = tmpPtr2;
-    tmpPtr2->next_node = list_tail;
-    list_size--;
-    return temp;
+    }
+    
 }
 
 template <typename Type>
 int Double_sentinel_list<Type>::erase( Type const &obj ) {
-	// enter your implementation here
-    // Instructions: Delete the first node (from the front and other than the sentinals) in the linked list that contains the object equal to the argument (use == to to test for equality with the retrieved element). Update the previous and next pointers of any other node (including possibly the sentinels) within the list. Return the number of nodes that were deleted.
-            // Does this mean that we delete only the first match, or all matches?
+    // If the list is empty, there is nothing to erase and the client can be told that 0 items were erased
     if (empty()) return 0;
+    
+    // Otherwise, iterate through the list and erase all matching instances, while counting the number of erases
     int count = 0;
     for (Double_node<Type> *stepper = list_head->next(); stepper != nullptr; )
     {
@@ -318,8 +290,6 @@ int Double_sentinel_list<Type>::erase( Type const &obj ) {
     }
 	return count;
 }
-
-// You can modify this function however you want:  it will not be tested
 
 template <typename T>
 std::ostream &operator<<( std::ostream &out, Double_sentinel_list<T> const &list ) {
@@ -347,8 +317,5 @@ std::ostream &operator<<( std::ostream &out, Double_sentinel_list<T> const &list
 
 	return out;
 }
-
-// Is an error showing up in ece250.h or elsewhere?
-// Did you forget a closing '}' ?
 
 #endif
